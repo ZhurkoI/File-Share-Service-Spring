@@ -1,0 +1,87 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet id="1.0.0" author="igor">
+        <sql>
+            CREATE TABLE IF NOT EXISTS users (
+                id          BIGINT          AUTO_INCREMENT  PRIMARY KEY,
+                first_name  VARCHAR(100)    NOT NULL,
+                last_name   VARCHAR(100)    NOT NULL,
+                email       VARCHAR(255)    NOT NULL    UNIQUE,
+                username    VARCHAR(100)    NOT NULL    UNIQUE,
+                password    VARCHAR(255)    NOT NULL,
+                status      VARCHAR(25)     NOT NULL   DEFAULT 'ACTIVE',
+                created     TIMESTAMP       NOT NULL   DEFAULT CURRENT_TIMESTAMP,
+                updated     TIMESTAMP       NOT NULL   DEFAULT CURRENT_TIMESTAMP
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0.1" author="igor">
+        <sql>
+            CREATE TABLE IF NOT EXISTS roles (
+                id          BIGINT          AUTO_INCREMENT  PRIMARY KEY,
+                name        VARCHAR(100)    NOT NULL    UNIQUE,
+                status      VARCHAR(25)     NOT NULL    DEFAULT 'ACTIVE',
+                created     TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+                updated     TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0.2" author="igor">
+        <sql>
+            CREATE TABLE IF NOT EXISTS user_role (
+                user_id         BIGINT,
+                role_id         BIGINT
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0.3" author="igor">
+        <sql>
+            CREATE TABLE IF NOT EXISTS files (
+                id          BIGINT          NOT NULL    AUTO_INCREMENT  PRIMARY KEY,
+                location    VARCHAR(255)    NOT NULL,
+                status      VARCHAR(25)     NOT NULL    DEFAULT 'ACTIVE',
+                created     TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+                updated     TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0.4" author="igor">
+        <sql>
+            CREATE TABLE IF NOT EXISTS events (
+            id          BIGINT          NOT NULL    AUTO_INCREMENT      PRIMARY KEY,
+            type        VARCHAR(25)     NOT NULL    DEFAULT 'ACTIVE',
+            status      VARCHAR(25)     NOT NULL    DEFAULT 'ACTIVE',
+            created     TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+            updated     TIMESTAMP       NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+            file_id     BIGINT          NOT NULL,
+            user_id     BIGINT          NOT NULL,
+            CONSTRAINT FK_file
+                FOREIGN KEY (file_id)
+                REFERENCES files (id)
+                ON DELETE CASCADE,
+            CONSTRAINT FK_user
+                FOREIGN KEY (user_id)
+                REFERENCES users (id)
+                ON DELETE CASCADE
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0.5" author="igor">
+        <sql>
+            INSERT INTO roles (name)
+            VALUES
+                ('ROLE_ADMIN'),
+                ('ROLE_MODERATOR'),
+                ('ROLE_USER');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
+

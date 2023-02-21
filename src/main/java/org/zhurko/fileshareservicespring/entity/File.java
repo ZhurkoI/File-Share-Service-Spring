@@ -1,4 +1,4 @@
-package org.zhurko.fileshareservicespring.model.entity;
+package org.zhurko.fileshareservicespring.entity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,8 +14,11 @@ import java.util.List;
 @Table(name = "files")
 public class File extends BaseEntity {
 
-    @Column(name = "location", nullable = false)
-    private String location;
+    @Column(name = "path", nullable = false)
+    private String path;
+
+    @Column(name = "name", nullable = false)
+    private String fileName;
 
     @OneToMany(mappedBy = "file", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Event> events = new ArrayList<>();
@@ -23,16 +26,20 @@ public class File extends BaseEntity {
     public File() {
     }
 
-    public File(String location) {
-        this.location = location;
+    public String getPath() {
+        return path;
     }
 
-    public String getLocation() {
-        return location;
+    public void setPath(String path) {
+        this.path = path;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public List<Event> getEvents() {

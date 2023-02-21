@@ -1,58 +1,42 @@
 package org.zhurko.fileshareservicespring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.zhurko.fileshareservicespring.model.entity.UserRole;
-import org.zhurko.fileshareservicespring.model.Status;
-import org.zhurko.fileshareservicespring.model.entity.User;
+import org.zhurko.fileshareservicespring.entity.Status;
+import org.zhurko.fileshareservicespring.entity.User;
+import org.zhurko.fileshareservicespring.entity.UserRole;
 import org.zhurko.fileshareservicespring.repository.RoleRepository;
 import org.zhurko.fileshareservicespring.repository.UserRepository;
 import org.zhurko.fileshareservicespring.service.UserService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
-
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-    }
-
-    // TODO: получается, что каждый метод должен вести себя специфически, в зависимости от роли вызывающего пользователя:
-    //  - Админ -- видеть/редактировать всех пользователе, включая DELETED
-    //  - MODERATOR -- только видеть пользователей, включая DELETED
-    //  - USER -- не имеет доступа к эндпоинту users вовсе
-    @Override
-    public User getById(Long id) {
-        // TODO: перепимать логику в зависимости от роли пользователя, к-й запрашивает юзера
-        User user = userRepository.findById(id).orElseThrow();
-        if (user.getStatus() == Status.DELETED) {
-            throw new NoSuchElementException();
-        }
-
-        return user;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public User save(User user) {
-        // TODO - здесь нельзя слепо сетить статус и роль.  Заменить двумя методами: register + get?
-
-//        UserRole role = new UserRole();
-        // TODO: роли нужно запрашивать из БД, как готовый объект
-
+    public User register(User user) {
         UserRole roleUser = roleRepository.findByName("ROLE_USER");
         List<UserRole> roles = new ArrayList<>();
         roles.add(roleUser);
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(roles);
         user.setStatus(Status.ACTIVE);
 
@@ -60,14 +44,61 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteById(Long id) {
-        User user = userRepository.findById(id).orElseThrow();
-        user.setStatus(Status.DELETED);
-        userRepository.save(user);
+    public User update(User user) {
+        User result = userRepository.findById(user.getId()).orElseThrow();
+
+        if (user.getStatus() == Status.ACTIVE & result.getStatus() == Status.DELETED) {
+            result.setStatus(Status.ACTIVE);
+        }
+
+        if (user.getFirstName() != null) {
+            result.setFirstName(user.getFirstName());
+        }
+
+        if (user.getLastName() != null) {
+            result.setLastName(user.getLastName());
+        }
+
+        if (user.getRoles() != null) {
+            List<UserRole> roles = user.getRoles().
+                    stream()
+                    .map(r -> roleRepository.findByName(r.getName()))
+                    .collect(Collectors.toList());
+            result.setRoles(roles);
+        }
+
+        if (user.getStatus() != null) {
+            result.setStatus(user.getStatus());
+        }
+
+        return userRepository.save(result);
     }
 
     @Override
-    public List<User> findAll() {
-        return (List<User>) userRepository.findAll();
+    public List<User> getAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User getById(Long id) {
+        return userRepository.findById(id).orElseThrow();
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        User result = userRepository.findByUsername(username);
+        if (result == null) {
+            throw new NoSuchElementException("User '" + username + "' not found");
+        }
+
+        return result;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        User result = userRepository.findById(id).orElseThrow();
+        result.setStatus(Status.DELETED);
+        result.setUpdated(new Date());
+        userRepository.save(result);
     }
 }

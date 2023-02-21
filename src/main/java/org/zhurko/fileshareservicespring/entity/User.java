@@ -1,6 +1,4 @@
-package org.zhurko.fileshareservicespring.model.entity;
-
-import org.zhurko.fileshareservicespring.model.Status;
+package org.zhurko.fileshareservicespring.entity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,14 +30,10 @@ public class User extends BaseEntity {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "user_role",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
@@ -104,14 +98,6 @@ public class User extends BaseEntity {
         event.setUser(this);
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public List<UserRole> getRoles() {
         return roles;
     }
@@ -119,5 +105,4 @@ public class User extends BaseEntity {
     public void setRoles(List<UserRole> roles) {
         this.roles = roles;
     }
-
 }

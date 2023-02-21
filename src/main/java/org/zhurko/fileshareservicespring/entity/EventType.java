@@ -1,4 +1,4 @@
-package org.zhurko.fileshareservicespring.model;
+package org.zhurko.fileshareservicespring.entity;
 
 public enum EventType {
     UPLOADED,

@@ -1,19 +1,24 @@
-package org.zhurko.fileshareservicespring.model.entity;
+package org.zhurko.fileshareservicespring.entity;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.zhurko.fileshareservicespring.model.Status;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
 import java.util.Date;
 
+import static javax.persistence.TemporalType.TIMESTAMP;
+
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
 
     @Id
@@ -22,15 +27,17 @@ public class BaseEntity {
     private Long id;
 
     @CreatedDate
+    @Temporal(TIMESTAMP)
     @Column(name = "created", nullable = false)
     private Date created;
 
     @LastModifiedDate
-    @Column(name = "updated", nullable = false)
+    @Temporal(TIMESTAMP)
+    @Column(name = "updated")
     private Date updated;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     private Status status;
 
     public Long getId() {

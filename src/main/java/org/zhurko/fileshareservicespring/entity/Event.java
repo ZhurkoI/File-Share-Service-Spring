@@ -1,7 +1,6 @@
-package org.zhurko.fileshareservicespring.model.entity;
+package org.zhurko.fileshareservicespring.entity;
 
-import org.zhurko.fileshareservicespring.model.EventType;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;

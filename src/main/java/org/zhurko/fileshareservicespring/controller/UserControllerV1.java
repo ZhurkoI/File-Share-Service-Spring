@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.zhurko.fileshareservicespring.model.dto.UserDTO;
-import org.zhurko.fileshareservicespring.model.entity.User;
+import org.zhurko.fileshareservicespring.dto.AdminUserDto;
+import org.zhurko.fileshareservicespring.entity.User;
 import org.zhurko.fileshareservicespring.service.UserService;
 
 import javax.validation.Valid;
@@ -21,85 +21,92 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+// TODO: поставить слеш в конце пути "/api/v1/users"  и протестить
 @RestController
 @RequestMapping(path = "/api/v1/users")
 public class UserControllerV1 {
+
     @Autowired
     private UserService userService;
 
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> getUser(@PathVariable("id") Long userId) {
+    public ResponseEntity<AdminUserDto> getUser(@PathVariable("id") Long userId) {
+        if (userId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // todo: код из примера - где создается этот user? в контроллере?
+        User user;
+        try {
+            user = this.userService.getById(userId);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(AdminUserDto.fromEntity(user), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<AdminUserDto>> getAllUsers() {
+        List<User> result = this.userService.getAll();
+        if (result.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<AdminUserDto> users = result.stream()
+                .map(AdminUserDto::fromEntity)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AdminUserDto> saveUser(@RequestBody @Valid AdminUserDto adminUserDto) {
+        if (adminUserDto == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        User user = AdminUserDto.toEntity(adminUserDto);
+        User savedUser = this.userService.register(user);
+
+        return new ResponseEntity<>(AdminUserDto.fromEntity(savedUser), HttpStatus.CREATED);
+    }
+
+    @PutMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AdminUserDto> updateUser(@RequestBody @Valid AdminUserDto adminUserDto) {
+        if (adminUserDto == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        User updatedUser;
+        try {
+            updatedUser = this.userService.update(AdminUserDto.toEntity(adminUserDto));
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(AdminUserDto.fromEntity(updatedUser), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> deleteUser(@PathVariable("id") Long userId) {
         if (userId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         User user;
         try {
+            // TODO: перенести эту логику в сервисный метод deleteById
             user = this.userService.getById(userId);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(UserDTO.fromEntity(user), HttpStatus.OK);
-    }
-
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<User> users = this.userService.findAll();
-        if (users.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        // TODO - remove (user != null) verification
+        if (user != null) {
+            this.userService.deleteById(userId);
         }
-
-        List<UserDTO> usersDTO = users.stream()
-                .map(UserDTO::fromEntity)
-                .collect(Collectors.toList());
-
-        return new ResponseEntity<>(usersDTO, HttpStatus.OK);
-    }
-
-    @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> saveUser (@RequestBody @Valid UserDTO userDTO) {
-        if (userDTO == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        User savedUser = this.userService.save(userDTO.toEntity());
-
-        return new ResponseEntity<>(UserDTO.fromEntity(savedUser), HttpStatus.CREATED);
-    }
-
-    @PutMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> updateUser (@RequestBody @Valid UserDTO userDTO) {
-        if (userDTO == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        // TODO: нельзя слепо апдейтить save(DTO). Некоторые поля не доступны публично.
-        User updatedUser = this.userService.save(userDTO.toEntity());
-
-        return new ResponseEntity<>(UserDTO.fromEntity(updatedUser), HttpStatus.OK);
-    }
-
-    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> deleteUser (@PathVariable("id") Long userId) {
-        // todo: вместо id передать строку, то из аннотации @PathVariable летит исключение и контроллер сам
-        //  возвращает 400-Вad request. В логе ворнинг. Это допустимо? Как исправить?
-
-        // TODO: когда передается нету ID URL, то контроллер САМ возвращает нерелевантный код - 405-method not allowed.
-        //  Ворнинг в логе - Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'DELETE' not supported].
-        //  Такое нужно исправлять?
-        User user;
-        try {
-            user = this.userService.getById(userId);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        this.userService.deleteById(userId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
-
-// TODO: 500-ка на попытке вставить дубликата пользователя (не перехваченный SQL эксепшен)
-//  то же самое может быть при попытке проапдейтить пользователя на уже существующего в БД

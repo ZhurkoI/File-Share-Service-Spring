@@ -1,7 +1,9 @@
 package org.zhurko.fileshareservicespring.security.jwt;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -99,5 +101,18 @@ public class JwtUser implements UserDetails {
     @JsonIgnore
     public Date getLastPasswordResetDate() {
         return lastPasswordResetDate;
+    }
+
+    public static JwtUser getCurrentJwtUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (JwtUser) auth.getPrincipal();
+    }
+
+    public static boolean isNotAdminOrModerator(JwtUser user) {
+        if (user.getAuthorities().stream().noneMatch(a -> (a.getAuthority().equals("ROLE_ADMIN"))
+                || (a.getAuthority().equals("ROLE_MODERATOR")))) {
+            return true;
+        }
+        return false;
     }
 }

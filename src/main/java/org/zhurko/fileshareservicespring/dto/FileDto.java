@@ -18,7 +18,6 @@ public class FileDto {
     private Long id;
     private String path;
     private String fileName;
-
     private Status status;
     private List<EventDto> events = new ArrayList<>();
 

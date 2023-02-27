@@ -19,8 +19,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.liquibase:liquibase-core'
 	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.8.0'
-//	implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.400')
-//	implementation 'com.amazonaws:aws-java-sdk-s3'
 	implementation platform('software.amazon.awssdk:bom:2.20.2')
 	implementation 'software.amazon.awssdk:s3'
 	runtimeOnly 'mysql:mysql-connector-java'

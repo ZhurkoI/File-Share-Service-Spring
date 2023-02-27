@@ -42,10 +42,13 @@ public class SecurityConfig {
                     auth.antMatchers(HttpMethod.PUT, "/api/v1/users/").hasRole("ADMIN");
                     auth.antMatchers(HttpMethod.DELETE, "/api/v1/users/*").hasRole("ADMIN");
                     auth.antMatchers(HttpMethod.POST, "/api/v1/files/upload").hasAnyRole("ADMIN", "MODERATOR", "USER");
-                    auth.antMatchers(HttpMethod.GET, "/api/v1/files/").hasAnyRole("ADMIN", "MODERATOR", "USER");
+                    auth.antMatchers(HttpMethod.GET, "/api/v1/files/*").hasAnyRole("ADMIN", "MODERATOR", "USER");
                     auth.antMatchers(HttpMethod.PUT, "/api/v1/files/").hasAnyRole("ADMIN", "MODERATOR");
                     auth.antMatchers(HttpMethod.DELETE, "/api/v1/files/*").hasAnyRole("ADMIN", "MODERATOR");
-                    auth.anyRequest().permitAll();
+                    auth.antMatchers(HttpMethod.GET, "/api/v1/events/*").hasAnyRole("ADMIN", "MODERATOR", "USER");
+                    auth.antMatchers(HttpMethod.PUT, "/api/v1/events/").hasAnyRole("ADMIN", "MODERATOR");
+                    auth.antMatchers(HttpMethod.DELETE, "/api/v1/events/*").hasAnyRole("ADMIN", "MODERATOR");
+                    auth.anyRequest().denyAll();
                 })
                 .apply(new JwtConfigurer(jwtTokenProvider));
 

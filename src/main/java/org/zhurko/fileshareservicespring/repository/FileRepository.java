@@ -13,5 +13,12 @@ public interface FileRepository extends JpaRepository<File, Long> {
     @Query(value = "SELECT f.id, f.path, f.name, f.status, f.created, f.updated " +
             "FROM files f JOIN events e ON f.id = e.file_id " +
             "WHERE e.user_id = ?1", nativeQuery = true)
-    List<File> findFilesOfSpecifiedUser(Long userId);
+    List<File> findAllFilesOfSpecifiedUser(Long userId);
+
+    @Query(value = "SELECT f.id, f.path, f.name, f.status, f.created, f.updated " +
+            "FROM files f " +
+            "JOIN events e ON f.id = e.file_id " +
+            "JOIN users u ON e.user_id = u.id " +
+            "WHERE u.id = ?1 AND f.id = ?2", nativeQuery = true)
+    File findFileOfSpecifiedUser(Long userId, Long fileId);
 }

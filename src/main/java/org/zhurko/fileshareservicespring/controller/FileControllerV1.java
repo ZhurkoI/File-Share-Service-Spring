@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +38,6 @@ public class FileControllerV1 {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FileDto> upload(@RequestParam("file") MultipartFile file) throws IOException {
-        // TODO:  get rid of 'User-Id'
         // TODO:  Error in Tomcat - cannot delete file in local directory
         if (file.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -71,7 +69,7 @@ public class FileControllerV1 {
         return new ResponseEntity<>(FileDto.fromEntity(file), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FileDto> getFile(@PathVariable("id") Long fileId) {
         if (fileId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -101,7 +99,7 @@ public class FileControllerV1 {
         return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deleteFile(@PathVariable("id") Long fileId) {
         if (fileId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

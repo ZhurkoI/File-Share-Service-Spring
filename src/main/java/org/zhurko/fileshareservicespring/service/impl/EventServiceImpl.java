@@ -3,10 +3,16 @@ package org.zhurko.fileshareservicespring.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zhurko.fileshareservicespring.entity.Event;
+import org.zhurko.fileshareservicespring.entity.Status;
 import org.zhurko.fileshareservicespring.repository.EventRepository;
+import org.zhurko.fileshareservicespring.security.jwt.JwtUser;
 import org.zhurko.fileshareservicespring.service.EventService;
 
+import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -20,22 +26,49 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Event getById(Long id) {
-        return null;
+    public Event getById(Long eventId) {
+        JwtUser currentJwtUser = JwtUser.getCurrentJwtUser();
+        if (JwtUser.isNotAdminOrModerator(currentJwtUser)) {
+            Event result = eventRepository.findById(eventId).orElseThrow(NoSuchElementException::new);
+
+            if (result.getStatus().equals(Status.ACTIVE)
+                    && (Objects.equals(result.getUser().getId(), currentJwtUser.getId()))) {
+                return result;
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+
+        return eventRepository.findById(eventId).orElseThrow(NoSuchElementException::new);
     }
 
     @Override
     public List<Event> getAll() {
-        return null;
+        JwtUser currentJwtUser = JwtUser.getCurrentJwtUser();
+        if (JwtUser.isNotAdminOrModerator(currentJwtUser)) {
+            List<Event> result = eventRepository.findAllByUserId(currentJwtUser.getId());
+            return result.stream()
+                    .filter(e -> e.getStatus().equals(Status.ACTIVE))
+                    .collect(Collectors.toList());
+        }
+
+        return eventRepository.findAll();
     }
 
     @Override
     public Event update(Event event) {
-        return null;
+        Event result = eventRepository.findById(event.getId()).orElseThrow(NoSuchElementException::new);
+        result.setStatus(event.getStatus());
+        result.setUpdated(new Date());
+
+        return eventRepository.save(result);
     }
 
     @Override
     public void deleteById(Long id) {
-
+        Event event = eventRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        event.setStatus(Status.DELETED);
+        event.setUpdated(new Date());
+        eventRepository.save(event);
     }
 }

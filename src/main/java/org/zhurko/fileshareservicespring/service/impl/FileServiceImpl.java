@@ -11,7 +11,6 @@ import org.zhurko.fileshareservicespring.entity.EventType;
 import org.zhurko.fileshareservicespring.entity.File;
 import org.zhurko.fileshareservicespring.entity.Status;
 import org.zhurko.fileshareservicespring.entity.User;
-import org.zhurko.fileshareservicespring.repository.EventRepository;
 import org.zhurko.fileshareservicespring.repository.FileRepository;
 import org.zhurko.fileshareservicespring.repository.UserRepository;
 import org.zhurko.fileshareservicespring.security.jwt.JwtUser;
@@ -41,9 +40,6 @@ public class FileServiceImpl implements FileService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private EventRepository eventRepository;
 
     @Value("${aws.s3.bucket.name}")
     private String bucketName;
@@ -101,8 +97,10 @@ public class FileServiceImpl implements FileService {
     public File getById(Long fileId) {
         JwtUser currentJwtUser = getCurrentJwtUser();
         if (isNotAdminOrModerator(currentJwtUser)) {
-            File result = fileRepository.findById(fileId).orElseThrow(NoSuchElementException::new);
-            // TODO: bug - returns the file of another user.
+            File result = fileRepository.findFileOfSpecifiedUser(currentJwtUser.getId(), fileId);
+            if (result == null) {
+                throw new NoSuchElementException();
+            }
             if (result.getStatus().equals(Status.ACTIVE)) {
                 return result;
             } else {
@@ -117,7 +115,7 @@ public class FileServiceImpl implements FileService {
     public List<File> getAll() {
         JwtUser currentJwtUser = getCurrentJwtUser();
         if (isNotAdminOrModerator(currentJwtUser)) {
-            List<File> result = fileRepository.findFilesOfSpecifiedUser(currentJwtUser.getId());
+            List<File> result = fileRepository.findAllFilesOfSpecifiedUser(currentJwtUser.getId());
 
             return result.stream()
                     .filter(f -> (!f.getStatus().equals(Status.DELETED)))
@@ -135,11 +133,13 @@ public class FileServiceImpl implements FileService {
         fileRepository.save(file);
     }
 
+    // todo: использовать общий статический метод JwtUser.getCurrentJwtUser
     private JwtUser getCurrentJwtUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (JwtUser) auth.getPrincipal();
     }
 
+    // todo: вынести в общий статический метод
     private boolean isNotAdminOrModerator(JwtUser user) {
         if (user.getAuthorities().stream().noneMatch(a -> (a.getAuthority().equals("ROLE_ADMIN"))
                 || (a.getAuthority().equals("ROLE_MODERATOR")))) {

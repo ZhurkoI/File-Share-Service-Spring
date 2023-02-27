@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.zhurko.fileshareservicespring.entity.Event;
 import org.zhurko.fileshareservicespring.entity.EventType;
+import org.zhurko.fileshareservicespring.entity.Status;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 
@@ -14,14 +16,18 @@ public class EventDto {
 
     private Long id;
 
+    @NotNull
     private EventType eventType;
 
+    @NotNull
+    private Status status;
+
+    @NotNull
     private FileDto file;
 
+    @NotNull
     private UserDto user;
-
     private Date created;
-
     private Date updated;
 
     public Long getId() {
@@ -72,16 +78,23 @@ public class EventDto {
         this.updated = updated;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     public static Event toEntity(EventDto eventDto) {
         Event event = new Event();
         if (eventDto.getId() != 0) {
             event.setId(eventDto.getId());
         }
         event.setEventType(eventDto.getEventType());
+        event.setStatus(eventDto.getStatus());
         event.setFile(FileDto.toEntity(eventDto.getFile()));
         event.setUser(UserDto.toEntity(eventDto.getUser()));
-        event.setCreated(eventDto.getCreated());
-        event.setUpdated(eventDto.getUpdated());
 
         return event;
     }
@@ -90,6 +103,7 @@ public class EventDto {
         EventDto eventDto = new EventDto();
         eventDto.setId(event.getId());
         eventDto.setEventType(event.getEventType());
+        eventDto.setStatus(event.getStatus());
         eventDto.setFile(FileDto.fromEntity(event.getFile()));
         eventDto.setUser(UserDto.fromEntity(event.getUser()));
 

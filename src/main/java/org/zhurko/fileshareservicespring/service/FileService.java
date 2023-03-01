@@ -6,6 +6,7 @@ import org.zhurko.fileshareservicespring.entity.File;
 import java.io.IOException;
 import java.util.List;
 
+
 public interface FileService {
 
     File upload(MultipartFile file) throws IOException;

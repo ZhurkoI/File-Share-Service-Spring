@@ -5,15 +5,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.zhurko.fileshareservicespring.entity.User;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
+
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
-// todo: проверить, нужна ли эта DTO?
+
     private Long id;
 
     @Size(max = 100)

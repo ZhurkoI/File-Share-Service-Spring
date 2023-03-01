@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+
 @RestController
 @RequestMapping(path = "/api/v1/events/")
 public class EventControllerV1 {
@@ -59,7 +60,6 @@ public class EventControllerV1 {
 
     @PutMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDto> updateEvent(@RequestBody @Valid EventDto eventDto) {
-        // TODO: поресерчить тему, если в EntityDTO придут модифицированные поля родительских сущностей File и User -- не покараптятся ли они в БД
         if (eventDto.getId() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

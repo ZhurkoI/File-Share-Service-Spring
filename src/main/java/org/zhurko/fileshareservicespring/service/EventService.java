@@ -4,6 +4,7 @@ import org.zhurko.fileshareservicespring.entity.Event;
 
 import java.util.List;
 
+
 public interface EventService {
 
     Event save(Event event);

@@ -13,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.zhurko.fileshareservicespring.security.jwt.JwtConfigurer;
 import org.zhurko.fileshareservicespring.security.jwt.JwtTokenProvider;
 
+
 @Configuration
 public class SecurityConfig {
 

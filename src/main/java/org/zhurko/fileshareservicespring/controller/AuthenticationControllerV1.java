@@ -40,13 +40,6 @@ public class AuthenticationControllerV1 {
 
     @PostMapping("login")
     public ResponseEntity login(@RequestBody AuthenticationRequestDto requestDto) {
-        System.out.println("========================");
-        System.out.println(System.getProperty("aws.accessKeyId"));
-        System.out.println(System.getProperty("aws.secretAccessKey"));
-        System.out.println("------------");
-        System.out.println("Foo-key envVar - " + System.getenv("AWS_ACCESS_KEY_ID"));
-        System.out.println("Foo-secret envVar - " + System.getenv("AWS_SECRET_ACCESS_KEY"));
-        System.out.println("========================");
         try {
             String username = requestDto.getUsername();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));

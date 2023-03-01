@@ -7,10 +7,6 @@ import java.util.Map;
 
 public interface AmazonS3Service {
 
-    String upload( String bucketName, String objectKey, InputStream inputStream, Map<String, String> metadata)
+    String upload(String bucketName, String objectKey, InputStream inputStream, Map<String, String> metadata)
             throws FileAlreadyExistsException;
-
-//    boolean doesFileExist(String bucketName, String keyName);
-
-//    S3Object download(String path, String fileName);
 }

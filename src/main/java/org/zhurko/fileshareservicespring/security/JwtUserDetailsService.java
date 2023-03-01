@@ -10,6 +10,7 @@ import org.zhurko.fileshareservicespring.entity.User;
 import org.zhurko.fileshareservicespring.security.jwt.JwtUserFactory;
 import org.zhurko.fileshareservicespring.service.UserService;
 
+
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 

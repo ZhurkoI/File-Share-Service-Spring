@@ -17,8 +17,6 @@ public class UserRoleDto {
 
     private List<UserDto> users;
 
-
-
     public Long getId() {
         return id;
     }
@@ -47,10 +45,6 @@ public class UserRoleDto {
         UserRole userRole = new UserRole();
         userRole.setId(userRoleDto.getId());
         userRole.setName(userRoleDto.getName());
-//        userRole.setUsers(userRoleDto.getUsers()
-//                .stream()
-//                .map(UserDto::toEntity)
-//                .collect(Collectors.toList()));
 
         return userRole;
     }

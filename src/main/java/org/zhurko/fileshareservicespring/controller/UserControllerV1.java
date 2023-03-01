@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-// TODO: поставить слеш в конце пути "/api/v1/users"  и протестить
+
 @RestController
-@RequestMapping(path = "/api/v1/users")
+@RequestMapping(path = "/api/v1/users/")
 public class UserControllerV1 {
 
     @Autowired
@@ -35,7 +35,6 @@ public class UserControllerV1 {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        // todo: код из примера - где создается этот user? в контроллере?
         User user;
         try {
             user = this.userService.getById(userId);
@@ -66,8 +65,7 @@ public class UserControllerV1 {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        User user = AdminUserDto.toEntity(adminUserDto);
-        User savedUser = this.userService.register(user);
+        User savedUser = userService.register(AdminUserDto.toEntity(adminUserDto));
 
         return new ResponseEntity<>(AdminUserDto.fromEntity(savedUser), HttpStatus.CREATED);
     }
@@ -80,7 +78,7 @@ public class UserControllerV1 {
 
         User updatedUser;
         try {
-            updatedUser = this.userService.update(AdminUserDto.toEntity(adminUserDto));
+            updatedUser = userService.update(AdminUserDto.toEntity(adminUserDto));
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -94,17 +92,10 @@ public class UserControllerV1 {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        User user;
         try {
-            // TODO: перенести эту логику в сервисный метод deleteById
-            user = this.userService.getById(userId);
+            userService.deleteById(userId);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        // TODO - remove (user != null) verification
-        if (user != null) {
-            this.userService.deleteById(userId);
         }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -8,6 +8,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.util.List;
 
+
 @Entity
 @Table(name = "roles")
 public class UserRole extends BaseEntity {

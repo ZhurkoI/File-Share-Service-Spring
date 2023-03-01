@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+
 @RestController
 @RequestMapping(path = "/api/v1/files/")
 public class FileControllerV1 {
@@ -38,7 +39,6 @@ public class FileControllerV1 {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FileDto> upload(@RequestParam("file") MultipartFile file) throws IOException {
-        // TODO:  Error in Tomcat - cannot delete file in local directory
         if (file.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

@@ -6,6 +6,7 @@ import org.zhurko.fileshareservicespring.entity.File;
 
 import java.util.List;
 
+
 public interface FileRepository extends JpaRepository<File, Long> {
 
     File findByPathAndFileName(String path, String name);

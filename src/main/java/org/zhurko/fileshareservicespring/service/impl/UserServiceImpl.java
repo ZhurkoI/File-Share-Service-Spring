@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        User result = userRepository.findById(user.getId()).orElseThrow();
+        User result = userRepository.findById(user.getId()).orElseThrow(NoSuchElementException::new);
 
         if (user.getStatus() == Status.ACTIVE & result.getStatus() == Status.DELETED) {
             result.setStatus(Status.ACTIVE);
@@ -81,7 +82,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(Long id) {
-        return userRepository.findById(id).orElseThrow();
+        return userRepository.findById(id).orElseThrow(NoSuchElementException::new);
     }
 
     @Override
@@ -96,7 +97,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteById(Long id) {
-        User result = userRepository.findById(id).orElseThrow();
+        User result = userRepository.findById(id).orElseThrow(NoSuchElementException::new);
         result.setStatus(Status.DELETED);
         result.setUpdated(new Date());
         userRepository.save(result);

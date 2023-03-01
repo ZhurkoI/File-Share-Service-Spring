@@ -4,6 +4,7 @@ import org.zhurko.fileshareservicespring.entity.User;
 
 import java.util.List;
 
+
 public interface UserService {
 
     User register(User user);

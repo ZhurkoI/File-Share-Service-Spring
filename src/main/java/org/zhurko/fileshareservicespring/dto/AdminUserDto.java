@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AdminUserDto {
-// TODO: переделать в обычную userDto?
+
     private Long id;
 
     @Size(max = 100)

@@ -73,12 +73,6 @@ public class FileDto {
         file.setFileName(fileDto.getFileName());
         file.setStatus(fileDto.getStatus());
 
-        // TODO:  если из UpdateFile приходит пустая коллекция, то можем затереть существующие в БД
-//        file.setEvents(fileDto.getEvents()
-//                .stream()
-//                .map(EventDto::toEntity)
-//                .collect(Collectors.toList()));
-
         return file;
     }
 
@@ -87,12 +81,6 @@ public class FileDto {
         fileDto.setId(file.getId());
         fileDto.setPath(file.getPath());
         fileDto.setFileName(file.getFileName());
-
-        // закомментировал setEvents для тестирования upload ендпоинта
-//        fileDto.setEvents(file.getEvents()
-//                .stream()
-//                .map(EventDto::fromEntity)
-//                .collect(Collectors.toList()));
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getAuthorities().stream()

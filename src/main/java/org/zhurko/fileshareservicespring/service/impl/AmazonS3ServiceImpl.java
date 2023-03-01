@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Map;
 
+
 @Service
 public class AmazonS3ServiceImpl implements AmazonS3Service {
 
@@ -42,11 +43,10 @@ public class AmazonS3ServiceImpl implements AmazonS3Service {
             PutObjectResponse response = s3Client.putObject(
                     putOb,
                     RequestBody.fromInputStream(inputStream,
-                    inputStream.available()));
+                            inputStream.available()));
             return response.eTag();
         } catch (IOException | S3Exception e) {
             System.err.println(e.getMessage());
-            // todo: залогировать вместо этого
         }
 
         return "";
@@ -64,7 +64,8 @@ public class AmazonS3ServiceImpl implements AmazonS3Service {
         } catch (NoSuchKeyException e) {
             return false;
         } catch (S3Exception e) {
-            throw new RuntimeException("Cannot check existence of the file");
+            e.printStackTrace();
+            throw new RuntimeException("Cannot check existence of the file", e);
         }
 
         return true;

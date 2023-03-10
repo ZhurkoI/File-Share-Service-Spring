@@ -76,11 +76,26 @@
 
     <changeSet id="1.0.5" author="igor">
         <sql>
-            INSERT INTO roles (name)
-            VALUES
-                ('ROLE_ADMIN'),
-                ('ROLE_MODERATOR'),
-                ('ROLE_USER');
+            INSERT INTO roles (name, status, created, updated) VALUES
+            ('ROLE_ADMIN', DEFAULT, now(), now()),
+            ('ROLE_MODERATOR', DEFAULT, now(), now()),
+            ('ROLE_USER', DEFAULT, now(), now());
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0.6" author="igor">
+        <sql>
+            INSERT INTO users (first_name, last_name, email, username, password, status, created, updated) VALUES
+            ('admin', 'admin', 'admin@test.com', 'admin', '$2a$12$UHlv4o6/nL7EimhMaDvXt.AFlEqoh4PZvzVVLUeotf5n3ZtodXR/2', DEFAULT, now(), now());
+        </sql>
+    </changeSet>
+
+    <changeSet id="1.0.7" author="igor">
+        <sql>
+            INSERT INTO user_role (user_id,role_id) VALUES
+            (1,1),
+            (1,2),
+            (1,3);
         </sql>
     </changeSet>
 

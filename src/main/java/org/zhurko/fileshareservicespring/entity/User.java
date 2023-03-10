@@ -11,6 +11,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 @Entity
@@ -32,7 +33,7 @@ public class User extends BaseEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
     @JoinTable(name = "user_role",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
@@ -42,6 +43,14 @@ public class User extends BaseEntity {
     private List<Event> events = new ArrayList<>();
 
     public User() {
+    }
+
+    public User( String firstName, String lastName, String username, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
     public String getUsername() {
@@ -103,5 +112,21 @@ public class User extends BaseEntity {
 
     public void setRoles(List<UserRole> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return username.equals(user.username)
+                && firstName.equals(user.firstName)
+                && lastName.equals(user.lastName)
+                && email.equals(user.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, firstName, lastName, email);
     }
 }

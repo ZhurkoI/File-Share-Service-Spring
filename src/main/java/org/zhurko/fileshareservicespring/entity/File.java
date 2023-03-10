@@ -8,6 +8,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 @Entity
@@ -24,6 +25,11 @@ public class File extends BaseEntity {
     private List<Event> events = new ArrayList<>();
 
     public File() {
+    }
+
+    public File(String path, String fileName) {
+        this.path = path;
+        this.fileName = fileName;
     }
 
     public String getPath() {
@@ -53,5 +59,18 @@ public class File extends BaseEntity {
     public void addEvent(Event event) {
         events.add(event);
         event.setFile(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        File file = (File) o;
+        return fileName.equals(file.fileName) && Objects.equals(events, file.events);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fileName, events);
     }
 }

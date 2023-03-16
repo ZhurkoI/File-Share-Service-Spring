@@ -50,21 +50,9 @@ public class UserServiceImpl implements UserService {
     public User update(User user) {
         User result = userRepository.findById(user.getId()).orElseThrow(NoSuchElementException::new);
 
-        if (user.getStatus() == Status.ACTIVE & result.getStatus() == Status.DELETED) {
-            result.setStatus(Status.ACTIVE);
-        }
-
-        if (user.getFirstName() != null) {
-            result.setFirstName(user.getFirstName());
-        }
-
-        if (user.getLastName() != null) {
-            result.setLastName(user.getLastName());
-        }
-
         if (user.getRoles() != null) {
-            List<UserRole> roles = user.getRoles().
-                    stream()
+            List<UserRole> roles = user.getRoles()
+                    .stream()
                     .map(r -> roleRepository.findByName(r.getName()))
                     .collect(Collectors.toList());
             result.setRoles(roles);
@@ -73,6 +61,8 @@ public class UserServiceImpl implements UserService {
         if (user.getStatus() != null) {
             result.setStatus(user.getStatus());
         }
+
+        user.setUpdated(new Date());
 
         return userRepository.save(result);
     }
@@ -88,7 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByUsername(String username) {
+    public User getByUsername(String username) {
         User result = userRepository.findByUsername(username);
         if (result == null) {
             throw new NoSuchElementException("User '" + username + "' not found");

@@ -1,0 +1,1 @@
+INSERT INTO users (first_name, last_name, email, username, password, status, created, updated) VALUES('John-0', 'Doe-0', 'john-doe-0@test.com', 'john-doe-0', '$2a$12$C3HzoN8N4tYAzdKMd.hC/O0kg1Im5GslCCV.5oioJ4aKh4uwxfgty', DEFAULT, now(), now());

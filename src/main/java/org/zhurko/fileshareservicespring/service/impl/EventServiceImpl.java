@@ -28,12 +28,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event getById(Long eventId) {
-        JwtUser currentJwtUser = JwtUser.getCurrentJwtUser();
-        if (JwtUser.isNotAdminOrModerator(currentJwtUser)) {
+        if (JwtUser.isCurrentUserNotAdminOrModerator()) {
             Event result = eventRepository.findById(eventId).orElseThrow(NoSuchElementException::new);
 
             if (result.getStatus().equals(Status.ACTIVE)
-                    && (Objects.equals(result.getUser().getId(), currentJwtUser.getId()))) {
+                    && (Objects.equals(result.getUser().getId(), JwtUser.getCurrentJwtUser().getId()))) {
                 return result;
             } else {
                 throw new NoSuchElementException();
@@ -45,9 +44,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<Event> getAll() {
-        JwtUser currentJwtUser = JwtUser.getCurrentJwtUser();
-        if (JwtUser.isNotAdminOrModerator(currentJwtUser)) {
-            List<Event> result = eventRepository.findAllByUserId(currentJwtUser.getId());
+        if (JwtUser.isCurrentUserNotAdminOrModerator()) {
+            List<Event> result = eventRepository.findAllByUserId(JwtUser.getCurrentJwtUser().getId());
             return result.stream()
                     .filter(e -> e.getStatus().equals(Status.ACTIVE))
                     .collect(Collectors.toList());

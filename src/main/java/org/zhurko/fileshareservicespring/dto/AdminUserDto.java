@@ -6,6 +6,7 @@ import org.zhurko.fileshareservicespring.entity.Status;
 import org.zhurko.fileshareservicespring.entity.User;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,21 +19,26 @@ public class AdminUserDto {
     private Long id;
 
     @Size(max = 100)
+    @NotNull
     private String username;
 
     @Size(max = 100)
+    @NotNull
     private String firstName;
 
     @Size(max = 100)
+    @NotNull
     private String lastName;
 
     @Email
     @Size(max = 255)
+    @NotNull
     private String email;
 
     @Size(max = 255)
     private String password;
 
+    @NotNull
     private Status status;
 
     private List<UserRoleDto> roles;

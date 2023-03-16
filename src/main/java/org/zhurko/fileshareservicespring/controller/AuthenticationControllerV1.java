@@ -43,7 +43,7 @@ public class AuthenticationControllerV1 {
         try {
             String username = requestDto.getUsername();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
-            User user = userService.findByUsername(username);
+            User user = userService.getByUsername(username);
             if (user == null) {
                 throw new UsernameNotFoundException("User with '" + username + "' not found");
             }

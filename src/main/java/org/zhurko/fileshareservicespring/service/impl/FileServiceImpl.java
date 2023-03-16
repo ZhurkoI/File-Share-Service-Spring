@@ -2,6 +2,8 @@ package org.zhurko.fileshareservicespring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.zhurko.fileshareservicespring.entity.Event;
@@ -49,7 +51,7 @@ public class FileServiceImpl implements FileService {
         metadata.put("Content-Type", file.getContentType());
         metadata.put("Content-Length", String.valueOf(file.getSize()));
 
-        User user = userRepository.findByUsername(JwtUser.getCurrentJwtUser().getUsername());
+        User user = userRepository.findByUsername(getCurrentJwtUser().getUsername());
 
         String remoteFilePath = String.format("%s/%s", user.getUsername(), file.getOriginalFilename());
 
@@ -94,9 +96,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public File getById(Long fileId) {
-        JwtUser currentJwtUser = JwtUser.getCurrentJwtUser();
-        if (JwtUser.isNotAdminOrModerator(currentJwtUser)) {
-            File result = fileRepository.findFileOfSpecifiedUser(currentJwtUser.getId(), fileId);
+        if (isCurrentUserNotAdminOrModerator()) {
+            File result = fileRepository.findFileOfSpecifiedUser(getCurrentJwtUser().getId(), fileId);
             if (result == null) {
                 throw new NoSuchElementException();
             }
@@ -112,9 +113,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<File> getAll() {
-        JwtUser currentJwtUser = JwtUser.getCurrentJwtUser();
-        if (JwtUser.isNotAdminOrModerator(currentJwtUser)) {
-            List<File> result = fileRepository.findAllFilesOfSpecifiedUser(currentJwtUser.getId());
+        if (isCurrentUserNotAdminOrModerator()) {
+            List<File> result = fileRepository.findAllFilesOfSpecifiedUser(getCurrentJwtUser().getId());
 
             return result.stream()
                     .filter(f -> (!f.getStatus().equals(Status.DELETED)))
@@ -130,5 +130,20 @@ public class FileServiceImpl implements FileService {
         file.setStatus(Status.DELETED);
         file.setUpdated(new Date());
         fileRepository.save(file);
+    }
+
+    public JwtUser getCurrentJwtUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (JwtUser) auth.getPrincipal();
+    }
+
+    public boolean isCurrentUserNotAdminOrModerator() {
+        JwtUser user = getCurrentJwtUser();
+        if (user.getAuthorities()
+                .stream()
+                .noneMatch(a -> (a.getAuthority().equals("ROLE_ADMIN")) || (a.getAuthority().equals("ROLE_MODERATOR")))) {
+            return true;
+        }
+        return false;
     }
 }

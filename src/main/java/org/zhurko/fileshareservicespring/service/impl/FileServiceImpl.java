@@ -13,7 +13,6 @@ import org.zhurko.fileshareservicespring.entity.Status;
 import org.zhurko.fileshareservicespring.entity.User;
 import org.zhurko.fileshareservicespring.repository.FileRepository;
 import org.zhurko.fileshareservicespring.repository.UserRepository;
-import org.zhurko.fileshareservicespring.security.jwt.JwtUser;
 import org.zhurko.fileshareservicespring.service.AmazonS3Service;
 import org.zhurko.fileshareservicespring.service.EventService;
 import org.zhurko.fileshareservicespring.service.FileService;
@@ -51,7 +50,7 @@ public class FileServiceImpl implements FileService {
         metadata.put("Content-Type", file.getContentType());
         metadata.put("Content-Length", String.valueOf(file.getSize()));
 
-        User user = userRepository.findByUsername(getCurrentJwtUser().getUsername());
+        User user = userRepository.findByUsername(getUsernameOfCurrentPrincipal());
 
         String remoteFilePath = String.format("%s/%s", user.getUsername(), file.getOriginalFilename());
 
@@ -60,29 +59,39 @@ public class FileServiceImpl implements FileService {
             throw new RuntimeException("File wasn't saved to remote storage");
         }
 
-        Date date = new Date();
-
-        File fileToSave = new File();
-        fileToSave.setPath(String.format("%s/%s", bucketName, user.getUsername()));
-        fileToSave.setFileName(file.getOriginalFilename());
-        fileToSave.setStatus(Status.ACTIVE);
-        fileToSave.setCreated(date);
-        fileToSave.setUpdated(date);
-
-        File savedFile = fileRepository.save(fileToSave);
-
-        Event uploadEvent = new Event();
-        uploadEvent.setEventType(EventType.UPLOADED);
-        uploadEvent.setStatus(Status.ACTIVE);
-        uploadEvent.setCreated(date);
-        uploadEvent.setUpdated(date);
-
+        File savedFile = createFile(file.getOriginalFilename(), user.getUsername());
+        Event uploadEvent = createEvent(savedFile, user);
         user.addEvent(uploadEvent);
         savedFile.addEvent(uploadEvent);
 
         eventService.save(uploadEvent);
 
         return savedFile;
+    }
+
+    private File createFile(String fileName, String username) {
+        Date date = new Date();
+        File fileToSave = new File();
+        fileToSave.setPath(String.format("%s/%s", bucketName, username));
+        fileToSave.setFileName(fileName);
+        fileToSave.setStatus(Status.ACTIVE);
+        fileToSave.setCreated(date);
+        fileToSave.setUpdated(date);
+
+        return fileRepository.save(fileToSave);
+    }
+
+    private Event createEvent(File file, User user) {
+        Date date = new Date();
+        Event event = new Event();
+        event.setEventType(EventType.UPLOADED);
+        event.setStatus(Status.ACTIVE);
+        event.setFile(file);
+        event.setUser(user);
+        event.setCreated(date);
+        event.setUpdated(date);
+
+        return event;
     }
 
     @Override
@@ -97,7 +106,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public File getById(Long fileId) {
         if (isCurrentUserNotAdminOrModerator()) {
-            File result = fileRepository.findFileOfSpecifiedUser(getCurrentJwtUser().getId(), fileId);
+            File result = fileRepository.findFileOfSpecifiedUser(getUsernameOfCurrentPrincipal(), fileId);
             if (result == null) {
                 throw new NoSuchElementException();
             }
@@ -114,7 +123,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public List<File> getAll() {
         if (isCurrentUserNotAdminOrModerator()) {
-            List<File> result = fileRepository.findAllFilesOfSpecifiedUser(getCurrentJwtUser().getId());
+            List<File> result = fileRepository.findAllFilesOfSpecifiedUser(getUsernameOfCurrentPrincipal());
 
             return result.stream()
                     .filter(f -> (!f.getStatus().equals(Status.DELETED)))
@@ -132,18 +141,17 @@ public class FileServiceImpl implements FileService {
         fileRepository.save(file);
     }
 
-    public JwtUser getCurrentJwtUser() {
+    private boolean isCurrentUserNotAdminOrModerator() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return (JwtUser) auth.getPrincipal();
-    }
-
-    public boolean isCurrentUserNotAdminOrModerator() {
-        JwtUser user = getCurrentJwtUser();
-        if (user.getAuthorities()
-                .stream()
-                .noneMatch(a -> (a.getAuthority().equals("ROLE_ADMIN")) || (a.getAuthority().equals("ROLE_MODERATOR")))) {
+        if (auth.getAuthorities().stream().noneMatch(a -> (a.getAuthority().equals("ROLE_ADMIN"))
+                || (a.getAuthority().equals("ROLE_MODERATOR")))) {
             return true;
         }
         return false;
+    }
+
+    private String getUsernameOfCurrentPrincipal() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getName();
     }
 }

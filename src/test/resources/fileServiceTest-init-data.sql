@@ -8,10 +8,10 @@ INSERT INTO user_role (user_id,role_id) VALUES
 (3,3);
 
 INSERT INTO files (id, path, name, status, created, updated) VALUES
-(1, 'test.file-share-service.bucket/user', 'test_4 (3rd copy).txt', DEFAULT, now(), now()),
-(2, 'test.file-share-service.bucket/user', 'test_4 (4th copy).txt', DEFAULT, now(), now()),
-(3, 'test.file-share-service.bucket/user', 'test_4 (5th copy).txt', DEFAULT, now(), now()),
-(4, 'test.file-share-service.bucket/moderator', 'test_4 (6th copy).txt', DEFAULT, now(), now());
+(1, 'test.file-share-service.bucket/user', 'file_1.txt', DEFAULT, now(), now()),
+(2, 'test.file-share-service.bucket/user', 'file_2.txt', DEFAULT, now(), now()),
+(3, 'test.file-share-service.bucket/user', 'file_3.txt', DEFAULT, now(), now()),
+(4, 'test.file-share-service.bucket/moderator', 'file_4.txt', DEFAULT, now(), now());
 
 INSERT INTO events (id, type, status, created, updated, file_id, user_id) VALUES
 (1, 'UPLOADED', DEFAULT, now(), now(), 1, 3),

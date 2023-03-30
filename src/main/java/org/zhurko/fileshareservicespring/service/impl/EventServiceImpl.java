@@ -1,11 +1,13 @@
 package org.zhurko.fileshareservicespring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.zhurko.fileshareservicespring.entity.Event;
 import org.zhurko.fileshareservicespring.entity.Status;
 import org.zhurko.fileshareservicespring.repository.EventRepository;
-import org.zhurko.fileshareservicespring.security.jwt.JwtUser;
+import org.zhurko.fileshareservicespring.repository.UserRepository;
 import org.zhurko.fileshareservicespring.service.EventService;
 
 import java.util.Date;
@@ -21,18 +23,25 @@ public class EventServiceImpl implements EventService {
     @Autowired
     private EventRepository eventRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     public Event save(Event event) {
+        Date date = new Date();
+        event.setCreated(date);
+        event.setUpdated(date);
+
         return eventRepository.save(event);
     }
 
     @Override
     public Event getById(Long eventId) {
-        if (JwtUser.isCurrentUserNotAdminOrModerator()) {
+        if (isCurrentUserNotAdminOrModerator()) {
             Event result = eventRepository.findById(eventId).orElseThrow(NoSuchElementException::new);
 
             if (result.getStatus().equals(Status.ACTIVE)
-                    && (Objects.equals(result.getUser().getId(), JwtUser.getCurrentJwtUser().getId()))) {
+                    && (Objects.equals(result.getUser().getUsername(), getUsernameOfCurrentPrincipal()))) {
                 return result;
             } else {
                 throw new NoSuchElementException();
@@ -44,8 +53,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<Event> getAll() {
-        if (JwtUser.isCurrentUserNotAdminOrModerator()) {
-            List<Event> result = eventRepository.findAllByUserId(JwtUser.getCurrentJwtUser().getId());
+        if (isCurrentUserNotAdminOrModerator()) {
+            List<Event> result = eventRepository.findAllByUsername(getUsernameOfCurrentPrincipal());
             return result.stream()
                     .filter(e -> e.getStatus().equals(Status.ACTIVE))
                     .collect(Collectors.toList());
@@ -69,5 +78,19 @@ public class EventServiceImpl implements EventService {
         event.setStatus(Status.DELETED);
         event.setUpdated(new Date());
         eventRepository.save(event);
+    }
+
+    private boolean isCurrentUserNotAdminOrModerator() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().noneMatch(a -> (a.getAuthority().equals("ROLE_ADMIN"))
+                || (a.getAuthority().equals("ROLE_MODERATOR")))) {
+            return true;
+        }
+        return false;
+    }
+
+    private String getUsernameOfCurrentPrincipal() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getName();
     }
 }

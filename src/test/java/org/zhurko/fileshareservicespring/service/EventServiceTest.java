@@ -1,6 +1,5 @@
-package org.zhurko.fileshareservicespring;
+package org.zhurko.fileshareservicespring.service;
 
-import liquibase.pro.packaged.E;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,8 +12,6 @@ import org.zhurko.fileshareservicespring.entity.File;
 import org.zhurko.fileshareservicespring.entity.Status;
 import org.zhurko.fileshareservicespring.entity.User;
 import org.zhurko.fileshareservicespring.repository.EventRepository;
-import org.zhurko.fileshareservicespring.repository.UserRepository;
-import org.zhurko.fileshareservicespring.service.EventService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,10 +19,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -72,9 +67,7 @@ public class EventServiceTest {
 
         when(eventRepository.findById(anyLong())).thenReturn(Optional.of(storedEvent));
 
-        assertThrows(NoSuchElementException.class, () -> {
-            eventService.getById(eventId);
-        });
+        assertThrows(NoSuchElementException.class, () -> eventService.getById(eventId));
     }
 
     @Test
@@ -90,20 +83,16 @@ public class EventServiceTest {
 
         when(eventRepository.findById(anyLong())).thenReturn(Optional.of(storedEvent));
 
-        assertThrows(NoSuchElementException.class, () -> {
-            eventService.getById(eventId);
-        });
+        assertThrows(NoSuchElementException.class, () -> eventService.getById(eventId));
     }
 
     @Test
     @WithMockUser(username = "user", roles = {"USER"})
     void whenRegularUserGetsNonExistentEventById_thenNoSuchElementExceptionIsThrown() {
         Long eventId = 100500L;
-        when(eventRepository.findById(anyLong())).thenReturn(Optional.ofNullable(null));
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> {
-            eventService.getById(eventId);
-        });
+        assertThrows(NoSuchElementException.class, () -> eventService.getById(eventId));
     }
 
     @Test
@@ -127,11 +116,9 @@ public class EventServiceTest {
     @WithMockUser(username = "moderatorOrAdmin", roles = {"MODERATOR", "ADMIN"})
     void whenModeratorOrAdminGetsNonExistentEventById_thenNoSuchElementExceptionIsThrown() {
         Long eventId = 100500L;
-        when(eventRepository.findById(anyLong())).thenReturn(Optional.ofNullable(null));
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> {
-            eventService.getById(eventId);
-        });
+        assertThrows(NoSuchElementException.class, () -> eventService.getById(eventId));
     }
 
     private static String getUsernameOfCurrentPrincipal() {
@@ -216,13 +203,11 @@ public class EventServiceTest {
 
         when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> {
-            eventService.update(eventToUpdate);
-        });
+        assertThrows(NoSuchElementException.class, () -> eventService.update(eventToUpdate));
     }
 
     @Test
-    void whenUserTriesToDeleteExistingEvent_thenEventSavedWithDeletedStatus() {
+    void whenUserTriesToDeleteExistingEvent_thenEventStatusUpdated() {
         Event storedEvent = new Event();
         when(eventRepository.findById(anyLong())).thenReturn(Optional.of(storedEvent));
         when(eventRepository.save(storedEvent)).thenReturn(new Event());

@@ -1,4 +1,4 @@
-package org.zhurko.fileshareservicespring;
+package org.zhurko.fileshareservicespring.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +14,6 @@ import org.zhurko.fileshareservicespring.entity.Status;
 import org.zhurko.fileshareservicespring.entity.User;
 import org.zhurko.fileshareservicespring.repository.FileRepository;
 import org.zhurko.fileshareservicespring.repository.UserRepository;
-import org.zhurko.fileshareservicespring.service.AmazonS3Service;
-import org.zhurko.fileshareservicespring.service.EventService;
-import org.zhurko.fileshareservicespring.service.FileService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,9 +72,7 @@ public class FileServiceTest {
         Long fileId = 1L;
         when(fileRepository.findFileOfSpecifiedUser(anyString(), anyLong())).thenReturn(fooFile);
 
-        assertThrows(NoSuchElementException.class, () -> {
-            fileService.getById(fileId);
-        });
+        assertThrows(NoSuchElementException.class, () -> fileService.getById(fileId));
         verify(fileRepository, times(1)).findFileOfSpecifiedUser(getUsernameOfCurrentPrincipal(), fileId);
     }
 
@@ -113,9 +108,7 @@ public class FileServiceTest {
         Long fileId = 1L;
         when(fileRepository.findFileOfSpecifiedUser(anyString(), anyLong())).thenReturn(null);
 
-        assertThrows(NoSuchElementException.class, () -> {
-            fileService.getById(fileId);
-        });
+        assertThrows(NoSuchElementException.class, () -> fileService.getById(fileId));
         verify(fileRepository, times(1)).findFileOfSpecifiedUser(getUsernameOfCurrentPrincipal(), fileId);
     }
 
@@ -188,17 +181,17 @@ public class FileServiceTest {
             }
 
             @Override
-            public byte[] getBytes() throws IOException {
+            public byte[] getBytes() {
                 return new byte[0];
             }
 
             @Override
-            public InputStream getInputStream() throws IOException {
+            public InputStream getInputStream() {
                 return null;
             }
 
             @Override
-            public void transferTo(java.io.File dest) throws IOException, IllegalStateException {
+            public void transferTo(java.io.File dest) throws IllegalStateException {
 
             }
         };
@@ -234,7 +227,7 @@ public class FileServiceTest {
     }
 
     @Test
-    void whenUserTriesToDeleteFile_thenFileCanBeDeleted() {
+    void whenUserTriesToDeleteFile_thenFileStatusIsUpdated() {
         File storedFile = new File();
         when(fileRepository.findById(anyLong())).thenReturn(Optional.of(storedFile));
         when(fileRepository.save(storedFile)).thenReturn(new File());

@@ -58,10 +58,7 @@ public class UserServiceImpl implements UserService {
             result.setRoles(roles);
         }
 
-        if (user.getStatus() != null) {
-            result.setStatus(user.getStatus());
-        }
-
+        result.setStatus(user.getStatus());
         user.setUpdated(new Date());
 
         return userRepository.save(result);

@@ -21,7 +21,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping(value = "api/v1/auth/")
+@RequestMapping(value = "/api/v1/auth")
 public class AuthenticationControllerV1 {
 
     private final AuthenticationManager authenticationManager;
@@ -38,7 +38,7 @@ public class AuthenticationControllerV1 {
         this.userService = userService;
     }
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity login(@RequestBody AuthenticationRequestDto requestDto) {
         try {
             String username = requestDto.getUsername();

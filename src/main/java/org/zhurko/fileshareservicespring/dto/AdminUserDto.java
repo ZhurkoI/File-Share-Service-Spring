@@ -38,7 +38,6 @@ public class AdminUserDto {
     @Size(max = 255)
     private String password;
 
-    @NotNull
     private Status status;
 
     private List<UserRoleDto> roles;

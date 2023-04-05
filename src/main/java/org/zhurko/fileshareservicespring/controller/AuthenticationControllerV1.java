@@ -1,6 +1,7 @@
 package org.zhurko.fileshareservicespring.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping(value = "/api/v1/auth")
+@RequestMapping(value = "/api/v1/auth/")
 public class AuthenticationControllerV1 {
 
     private final AuthenticationManager authenticationManager;
@@ -38,8 +39,8 @@ public class AuthenticationControllerV1 {
         this.userService = userService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity login(@RequestBody AuthenticationRequestDto requestDto) {
+    @PostMapping("login")
+    public ResponseEntity<Map<Object, Object>> login(@RequestBody AuthenticationRequestDto requestDto) {
         try {
             String username = requestDto.getUsername();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
@@ -54,7 +55,7 @@ public class AuthenticationControllerV1 {
             response.put("username", username);
             response.put("token", token);
 
-            return ResponseEntity.ok(response);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username or password");
         }

@@ -37,7 +37,7 @@ public class FileControllerV1 {
     @Autowired
     private UserService userService;
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FileDto> upload(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

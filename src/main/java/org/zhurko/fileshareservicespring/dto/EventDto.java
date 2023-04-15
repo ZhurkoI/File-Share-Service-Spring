@@ -2,6 +2,8 @@ package org.zhurko.fileshareservicespring.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.zhurko.fileshareservicespring.entity.Event;
 import org.zhurko.fileshareservicespring.entity.EventType;
 import org.zhurko.fileshareservicespring.entity.Status;
@@ -22,10 +24,7 @@ public class EventDto {
     @NotNull
     private Status status;
 
-    @NotNull
     private FileDto file;
-
-    @NotNull
     private UserDto user;
     private Date created;
     private Date updated;
@@ -93,8 +92,6 @@ public class EventDto {
         }
         event.setEventType(eventDto.getEventType());
         event.setStatus(eventDto.getStatus());
-        event.setFile(FileDto.toEntity(eventDto.getFile()));
-        event.setUser(UserDto.toEntity(eventDto.getUser()));
 
         return event;
     }
@@ -103,9 +100,12 @@ public class EventDto {
         EventDto eventDto = new EventDto();
         eventDto.setId(event.getId());
         eventDto.setEventType(event.getEventType());
-        eventDto.setStatus(event.getStatus());
-        eventDto.setFile(FileDto.fromEntity(event.getFile()));
-        eventDto.setUser(UserDto.fromEntity(event.getUser()));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> (a.getAuthority().equals("ROLE_ADMIN")) || (a.getAuthority().equals("ROLE_MODERATOR")))) {
+            eventDto.setStatus(event.getStatus());
+        }
 
         return eventDto;
     }

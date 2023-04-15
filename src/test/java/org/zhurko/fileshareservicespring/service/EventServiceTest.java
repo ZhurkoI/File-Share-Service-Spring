@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 
 @SpringBootTest()
-public class EventServiceTest {
+class EventServiceTest {
 
     @Autowired
     EventService eventService;

@@ -9,6 +9,7 @@ import org.zhurko.fileshareservicespring.entity.Status;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -20,9 +21,6 @@ public class FileDto {
     private String fileName;
     private Status status;
     private List<EventDto> events = new ArrayList<>();
-
-    public FileDto() {
-    }
 
     public Long getId() {
         return id;
@@ -81,6 +79,11 @@ public class FileDto {
         fileDto.setId(file.getId());
         fileDto.setPath(file.getPath());
         fileDto.setFileName(file.getFileName());
+        fileDto.setEvents(
+                file.getEvents().stream()
+                        .map(EventDto::fromEntity)
+                        .collect(Collectors.toList())
+        );
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getAuthorities().stream()

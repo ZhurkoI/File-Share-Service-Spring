@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 
 @SpringBootTest
-public class FileServiceTest {
+class FileServiceTest {
 
     @Autowired
     FileService fileService;

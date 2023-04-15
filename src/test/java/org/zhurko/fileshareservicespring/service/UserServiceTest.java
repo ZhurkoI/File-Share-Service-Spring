@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 
 @SpringBootTest
-public class UserServiceTest {
+class UserServiceTest {
 
     @Autowired
     UserService userService;

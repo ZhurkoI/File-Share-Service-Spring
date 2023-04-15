@@ -47,6 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = "/insert-users.sql")
 class FileControllerV1Test {
 
     private static final String FILE_ENDPOINT = "/api/v1/files/";
@@ -64,17 +65,16 @@ class FileControllerV1Test {
     private MockMvc mvc;
 
     @Autowired
-    FileService fileService;
+    private FileService fileService;
 
     @Value("${aws.s3.bucket.name}")
-    String bucketName;
+    private String bucketName;
 
     @MockBean
-    AmazonS3Service amazonS3Service;
+    private AmazonS3Service amazonS3Service;
 
     @Test
     @Transactional
-    @Sql(scripts = "/fileServiceTest-insert-users.sql")
     @WithMockUser(username = fooRegularUser1, roles = {"USER"})
     void whenUserUploadsAFile_thenFileIsUploaded() throws Exception {
         MockMultipartFile testMultipartFile = getMockMultipartFile(fooFileName, fooFileContent);
@@ -94,7 +94,7 @@ class FileControllerV1Test {
 
     @Test
     @Transactional
-    @Sql(scripts = "/fileServiceTest-insert-users.sql")
+//    @Sql(scripts = "/insert-users.sql")
     @WithMockUser(username = fooModerator, roles = {"MODERATOR", "ADMIN"})
     void whenModeratorOrAdminRequestsExistingFileById_thenFileIsReturnedWithItsStatus() throws Exception {
         when(amazonS3Service.upload(anyString(), anyString(), any(InputStream.class), anyMap()))
@@ -116,7 +116,7 @@ class FileControllerV1Test {
 
     @Test
     @Transactional
-    @Sql(scripts = "/fileServiceTest-insert-users.sql")
+//    @Sql(scripts = "/insert-users.sql")
     void whenModeratorRequestsAFileOfAnotherUser_thenFileIsReturned() throws Exception {
         when(amazonS3Service.upload(anyString(), anyString(), any(InputStream.class), anyMap()))
                 .thenReturn("Uploaded");
@@ -142,7 +142,7 @@ class FileControllerV1Test {
 
     @Test
     @Transactional
-    @Sql(scripts = "/fileServiceTest-insert-users.sql")
+//    @Sql(scripts = "/insert-users.sql")
     void whenAdminRequestsAFileOfAnotherUser_thenFileIsReturned() throws Exception {
         when(amazonS3Service.upload(anyString(), anyString(), any(InputStream.class), anyMap()))
                 .thenReturn("Uploaded");
@@ -168,7 +168,7 @@ class FileControllerV1Test {
 
     @Test
     @Transactional
-    @Sql(scripts = "/fileServiceTest-insert-users.sql")
+//    @Sql(scripts = "/insert-users.sql")
     @WithMockUser(username = fooRegularUser1, roles = {"USER"})
     void whenRegularUserRequestsExistingFileById_thenFileIsReturnedWithoutItsStatus() throws Exception {
         when(amazonS3Service.upload(anyString(), anyString(), any(InputStream.class), anyMap()))
@@ -190,7 +190,7 @@ class FileControllerV1Test {
 
     @Test
     @Transactional
-    @Sql(scripts = "/fileServiceTest-insert-users.sql")
+//    @Sql(scripts = "/insert-users.sql")
     @WithMockUser(username = fooRegularUser1, roles = {"USER"})
     void whenRegularUserRequestsDeletedFileById_thenNotFoundIsReturned() throws Exception {
         when(amazonS3Service.upload(anyString(), anyString(), any(InputStream.class), anyMap()))
@@ -206,7 +206,7 @@ class FileControllerV1Test {
     }
 
     @Test
-    @Sql(scripts = "/fileServiceTest-insert-users.sql")
+//    @Sql(scripts = "/insert-users.sql")
     @Transactional
     void whenRegularUserRequestsFileOfAnotherUser_thenNotFoundIsReturned() throws Exception {
         MockMultipartFile testMultipartFile = getMockMultipartFile(fooFileName, fooFileContent);
@@ -229,7 +229,7 @@ class FileControllerV1Test {
 
     @Test
     @Transactional
-    @Sql(scripts = "/fileServiceTest-insert-users.sql")
+//    @Sql(scripts = "/insert-users.sql")
     void whenRegularUserRequestsAllFiles_thenListOfOnlyActiveFilesOfThisUserIsReturned() throws Exception {
         when(amazonS3Service.upload(anyString(), anyString(), any(InputStream.class), anyMap()))
                 .thenReturn("Uploaded");
@@ -273,6 +273,7 @@ class FileControllerV1Test {
     }
 
     @Test
+    @Transactional
     @WithMockUser(username = fooRegularUser1, roles = {"USER"})
     void whenRegularUserTriesToDeleteAFile_thenNoAccessIsReturned() throws Exception {
         mvc.perform(delete(FILE_ENDPOINT + 1L))
@@ -281,7 +282,7 @@ class FileControllerV1Test {
 
     @Test
     @Transactional
-    @Sql(scripts = "/fileServiceTest-insert-users.sql")
+//    @Sql(scripts = "/insert-users.sql")
     @WithMockUser(username = fooModerator, roles = {"MODERATOR", "ADMIN"})
     void whenModeratorOrAdminTriesToDeleteAFile_thenFileStatusAndUpdatedTimestampAreChanged() throws Exception {
         when(amazonS3Service.upload(anyString(), anyString(), any(InputStream.class), anyMap()))
@@ -303,6 +304,7 @@ class FileControllerV1Test {
     }
 
     @Test
+    @Transactional
     @WithMockUser(roles = {"USER"})
     void whenRegularTriesToUpdateAFile_thenNoAccessIsReturned() throws Exception {
         String requestBody = "\"key\": \"value\"";
@@ -315,7 +317,7 @@ class FileControllerV1Test {
 
     @Test
     @Transactional
-    @Sql(scripts = "/fileServiceTest-insert-users.sql")
+//    @Sql(scripts = "/insert-users.sql")
     @WithMockUser(username = fooModerator, roles = {"MODERATOR", "ADMIN"})
     void whenModeratorOrAdminTriesToUpdateAFile_thenFileStatusAndUpdatedTimestampAreChanged() throws Exception {
         when(amazonS3Service.upload(anyString(), anyString(), any(InputStream.class), anyMap()))

@@ -1,6 +1,5 @@
 package org.zhurko.fileshareservicespring.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,7 +15,6 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     private final UserService userService;
 
-    @Autowired
     public JwtUserDetailsService(@Lazy UserService userService) {
         this.userService = userService;
     }

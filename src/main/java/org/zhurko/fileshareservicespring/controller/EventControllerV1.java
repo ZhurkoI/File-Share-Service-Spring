@@ -1,6 +1,5 @@
 package org.zhurko.fileshareservicespring.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +24,11 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/api/v1/events/")
 public class EventControllerV1 {
 
-    @Autowired
-    private EventService eventService;
+    private final EventService eventService;
+
+    public EventControllerV1(EventService eventService) {
+        this.eventService = eventService;
+    }
 
     @GetMapping(path = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDto> getEvent(@PathVariable("id") Long eventId) {

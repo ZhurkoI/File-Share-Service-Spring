@@ -1,6 +1,5 @@
 package org.zhurko.fileshareservicespring.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,17 +28,18 @@ import java.util.stream.Collectors;
 @Service
 public class FileServiceImpl implements FileService {
 
-    @Autowired
-    private AmazonS3Service amazonS3Service;
+    private final AmazonS3Service amazonS3Service;
+    private final EventService eventService;
+    private final FileRepository fileRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private EventService eventService;
-
-    @Autowired
-    private FileRepository fileRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    public FileServiceImpl(AmazonS3Service amazonS3Service, EventService eventService,
+                           FileRepository fileRepository, UserRepository userRepository) {
+        this.amazonS3Service = amazonS3Service;
+        this.eventService = eventService;
+        this.fileRepository = fileRepository;
+        this.userRepository = userRepository;
+    }
 
     @Value("${aws.s3.bucket.name}")
     private String bucketName;

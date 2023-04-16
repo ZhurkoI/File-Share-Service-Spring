@@ -1,6 +1,5 @@
 package org.zhurko.fileshareservicespring.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,7 +28,6 @@ public class AuthenticationControllerV1 {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
 
-    @Autowired
     public AuthenticationControllerV1(
             AuthenticationManager authenticationManager,
             JwtTokenProvider jwtTokenProvider,

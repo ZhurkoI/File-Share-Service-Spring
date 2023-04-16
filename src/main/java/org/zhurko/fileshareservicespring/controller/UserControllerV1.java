@@ -1,6 +1,5 @@
 package org.zhurko.fileshareservicespring.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +25,11 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/api/v1/users/")
 public class UserControllerV1 {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public UserControllerV1(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AdminUserDto> getUser(@PathVariable("id") Long userId) {

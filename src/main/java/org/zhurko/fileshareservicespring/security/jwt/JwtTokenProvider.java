@@ -5,7 +5,6 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,14 +26,17 @@ import java.util.List;
 @Component
 public class JwtTokenProvider {
 
+    private final UserDetailsService userDetailsService;
+
     @Value("${jwt.token.secret}")
     private String secret;
 
     @Value("${jwt.token.expired}")
     private long validityInMilliseconds;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    public JwtTokenProvider(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {

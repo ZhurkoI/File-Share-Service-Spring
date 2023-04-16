@@ -1,13 +1,11 @@
 package org.zhurko.fileshareservicespring.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.zhurko.fileshareservicespring.entity.Event;
 import org.zhurko.fileshareservicespring.entity.Status;
 import org.zhurko.fileshareservicespring.repository.EventRepository;
-import org.zhurko.fileshareservicespring.repository.UserRepository;
 import org.zhurko.fileshareservicespring.service.EventService;
 
 import java.util.Date;
@@ -20,11 +18,11 @@ import java.util.stream.Collectors;
 @Service
 public class EventServiceImpl implements EventService {
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    public EventServiceImpl(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
 
     @Override
     public Event save(Event event) {

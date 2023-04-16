@@ -1,6 +1,5 @@
 package org.zhurko.fileshareservicespring.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,7 +19,6 @@ public class SecurityConfig {
     private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
     public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }

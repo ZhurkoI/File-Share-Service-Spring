@@ -1,6 +1,5 @@
 package org.zhurko.fileshareservicespring.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zhurko.fileshareservicespring.service.AmazonS3Service;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -20,8 +19,11 @@ import java.util.Map;
 @Service
 public class AmazonS3ServiceImpl implements AmazonS3Service {
 
-    @Autowired
-    private S3Client s3Client;
+    private final S3Client s3Client;
+
+    public AmazonS3ServiceImpl(S3Client s3Client) {
+        this.s3Client = s3Client;
+    }
 
     @Override
     public String upload(String bucketName, String objectKey, InputStream inputStream, Map<String, String> metadata)

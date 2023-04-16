@@ -1,6 +1,5 @@
 package org.zhurko.fileshareservicespring.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.zhurko.fileshareservicespring.dto.FileDto;
 import org.zhurko.fileshareservicespring.entity.File;
 import org.zhurko.fileshareservicespring.service.FileService;
-import org.zhurko.fileshareservicespring.service.UserService;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -31,11 +29,12 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/api/v1/files/")
 public class FileControllerV1 {
 
-    @Autowired
-    private FileService fileService;
+    private final FileService fileService;
 
-    @Autowired
-    private UserService userService;
+    public FileControllerV1(FileService fileService) {
+        this.fileService = fileService;
+    }
+
 
     @PostMapping(value = "upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FileDto> upload(@RequestParam("file") MultipartFile file) throws IOException {

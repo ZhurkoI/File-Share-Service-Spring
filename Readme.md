@@ -46,4 +46,4 @@ The built-in admin is:
    ~~~
    ./gradlew test
    ~~~
-   NOTE: environment variables with fake values should be specified first - AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_REGION, AWS_S3_BUCKET_NAME  
+   

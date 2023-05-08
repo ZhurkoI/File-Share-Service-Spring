@@ -30,7 +30,7 @@ public class EventControllerV1 {
         this.eventService = eventService;
     }
 
-    @GetMapping(path = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "{id}")
     public ResponseEntity<EventDto> getEvent(@PathVariable("id") Long eventId) {
         if (eventId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -46,7 +46,7 @@ public class EventControllerV1 {
         return new ResponseEntity<>(EventDto.fromEntity(event), HttpStatus.OK);
     }
 
-    @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "")
     public ResponseEntity<List<EventDto>> getAllEvents() {
         List<Event> result = eventService.getAll();
         if (result.isEmpty()) {
@@ -60,7 +60,7 @@ public class EventControllerV1 {
         return new ResponseEntity<>(events, HttpStatus.OK);
     }
 
-    @PutMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "")
     public ResponseEntity<EventDto> updateEvent(@RequestBody @Valid EventDto eventDto) {
         if (eventDto.getId() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -76,7 +76,7 @@ public class EventControllerV1 {
         return new ResponseEntity<>(EventDto.fromEntity(event), HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "{id}")
     public ResponseEntity<String> deleteEvent(@PathVariable("id") Long eventId) {
         if (eventId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

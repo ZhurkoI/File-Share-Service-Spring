@@ -31,7 +31,7 @@ public class UserControllerV1 {
         this.userService = userService;
     }
 
-    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{id}")
     public ResponseEntity<AdminUserDto> getUser(@PathVariable("id") Long userId) {
         if (userId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -47,7 +47,7 @@ public class UserControllerV1 {
         return new ResponseEntity<>(AdminUserDto.fromEntity(user), HttpStatus.OK);
     }
 
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "")
     public ResponseEntity<List<AdminUserDto>> getAllUsers() {
         List<User> result = this.userService.getAll();
         if (result.isEmpty()) {
@@ -61,7 +61,7 @@ public class UserControllerV1 {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "")
     public ResponseEntity<AdminUserDto> saveUser(@RequestBody @Valid AdminUserDto adminUserDto) {
         if (adminUserDto == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -72,7 +72,7 @@ public class UserControllerV1 {
         return new ResponseEntity<>(AdminUserDto.fromEntity(savedUser), HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "")
     public ResponseEntity<AdminUserDto> updateUser(@RequestBody @Valid AdminUserDto adminUserDto) {
         if (adminUserDto == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -88,7 +88,7 @@ public class UserControllerV1 {
         return new ResponseEntity<>(AdminUserDto.fromEntity(updatedUser), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long userId) {
         if (userId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -36,7 +36,7 @@ public class FileControllerV1 {
     }
 
 
-    @PostMapping(value = "upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<FileDto> upload(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -52,7 +52,7 @@ public class FileControllerV1 {
         return new ResponseEntity<>(FileDto.fromEntity(savedFile), HttpStatus.OK);
     }
 
-    @PutMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "")
     public ResponseEntity<FileDto> updateFile(@RequestBody @Valid FileDto fileDto) {
         if (fileDto.getId() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -68,7 +68,7 @@ public class FileControllerV1 {
         return new ResponseEntity<>(FileDto.fromEntity(file), HttpStatus.OK);
     }
 
-    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{id}")
     public ResponseEntity<FileDto> getFile(@PathVariable("id") Long fileId) {
         if (fileId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -84,7 +84,7 @@ public class FileControllerV1 {
         return new ResponseEntity<>(FileDto.fromEntity(file), HttpStatus.OK);
     }
 
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "")
     public ResponseEntity<List<FileDto>> getAllFiles() {
         List<File> result = this.fileService.getAll();
         if (result.isEmpty()) {
@@ -98,7 +98,7 @@ public class FileControllerV1 {
         return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "{id}")
     public ResponseEntity<String> deleteFile(@PathVariable("id") Long fileId) {
         if (fileId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
